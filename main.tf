@@ -34,6 +34,8 @@ resource "aws_route_table" "nology-uploader-rt" {
   }
 }
 
+//Module for the database, it will pass on variables to the database 
+//terraform files
 module "db-tier" {
   name="nology-uploader-db"
   source = "./modules/mysql-db"
@@ -41,10 +43,10 @@ module "db-tier" {
   route_table_id = "${aws_vpc.nology-uploader-vpc.main_routing_table}"
   cidr_block = "99.0.1.0/24"
   user_data = templatefile("./scripts/db_user_data.sh", {}) //NEED TO WORK ON GETTING SCRIPT FOR THIS
-  ami_id = "ami-0c39c5647431f40ef" //NEEDS TO BE CHANGED LATER BASED ON REGION AND IMAGE
+  ami_id = "ami-0c39c5647431f40ef" //NEEDS TO BE CHANGED LATER BASED ON REGION AND IMAGE, TO MATCH BACKEND MACHINE
 
   ingress = [{
-    from_port = 3306
+    from_port = 3306 //default mysql port
     to_port = 3306
     protocol = "tcp"
     cidr_block = "${module.app-tier.subnet_cidr_block}"
@@ -55,5 +57,16 @@ module "app-tier" {
   name = "nology-uploader-app"
   source = "./modules/app"
   vpc_id = "${aws_vpc.nology-uploader-vpc.id}"
-  
+  route_table_id = "${aws_vpc.nology-uploader-rt.id}"
+  cidr_block = "99.0.2.0/24"
+  user_data = templatefile("./scripts/app_user_data.sh", {/*mongodb_ip = module.db-tier.private_ip*/}) //NEED TO WORK ON GETTING SCRIPT FOR THIS
+  ami_id = "ami-0c39c5647431f40ef" //NEEDS TO BE CHANGED LATER BASED ON REGION AND IMAGE, TO MATCH FRONTEND MACHINE
+  map_public_ip_on_launch = true
+
+  ingress = [{
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_block = "0.0.0.0/0"
+  }]
 }
