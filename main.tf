@@ -55,5 +55,16 @@ module "app-tier" {
   name = "nology-uploader-app"
   source = "./modules/app"
   vpc_id = "${aws_vpc.nology-uploader-vpc.id}"
-  
+  route_table_id = "${aws_vpc.nology-uploader-rt.id}"
+  cidr_block = "99.0.2.0/24"
+  user_data = templatefile("./scripts/app_user_data.sh", {/*mongodb_ip = module.db-tier.private_ip*/}) //NEED TO WORK ON GETTING SCRIPT FOR THIS
+  ami_id = "ami-0c39c5647431f40ef" //NEEDS TO BE CHANGED LATER BASED ON REGION AND IMAGE, TO MATCH FRONTEND MACHINE
+  map_public_ip_on_launch = true
+
+  ingress = [{
+    from_port = 80
+    to_port = 80
+    protocol = "tcp"
+    cidr_block = "0.0.0.0/0"
+  }]
 }
