@@ -23,7 +23,6 @@ variable "user_data" {
   description = "user data to start the instance"
 }
 
-
 variable "ami_id" {
   description = "the id of the ami for the instance"
 }
