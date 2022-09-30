@@ -31,34 +31,36 @@ resource "aws_route_table" "rolan-rt" {
  }
 }
 
-resource "aws_ebs_volume" "rolan-volume" {
-  availability_zone = "us-west-1"
-  size              = 8
+#need to user packer for this
+# resource "aws_ami" "rolan-ami" {
+#   name                = "rolan-ami"
+#   virtualization_type = "hvm"
+#   root_device_name    = "/dev/sda1"
 
-  tags = {
-    Name = "rolan-volume"
-  }
-}
+#   ebs_block_device {
+#     device_name = "/dev/sda1"
+#     snapshot_id    = "${aws_ebs_snapshot.rolan_snap.id}"
+#   }
+# }
 
-resource "aws_ebs_snapshot" "rolan_snap" {
-  volume_id = "${aws_ebs_volume.rolan-volume.id}"
-  description = "Snapshot for project-rolan"
 
-  tags = {
-    Name = "rolan_snap"
-  }
-}
+# resource "aws_ebs_volume" "rolan-volume" {
+#   availability_zone = "us-west-1b"
+#   size              = 8
 
-resource "aws_ami" "rolan-ami" {
-  name                = "mysql-ami"
-  virtualization_type = "hvm"
-  root_device_name    = "/dev/sda1"
+#   tags = {
+#     Name = "rolan-volume"
+#   }
+# }
 
-  ebs_block_device {
-    device_name = "/dev/sda1"
-    snapshot_id    = "${aws_ebs_snapshot.rolan_snap.id}"
-  }
-}
+# resource "aws_ebs_snapshot" "rolan_snap" {
+#   volume_id = "${aws_ebs_volume.rolan-volume.id}"
+#   description = "Snapshot for project-rolan"
+
+#   tags = {
+#     Name = "rolan_snap"
+#   }
+# }
 
 module "db-tier" {
   name="rolan-db"
@@ -79,20 +81,20 @@ module "db-tier" {
   }]
 }
 
-# module "application-tier" {
-#   name="rolan-application"
-#   source="./modules/application-tier" #looks for a main tf at that path
-#   vpc_id="${aws_vpc.rolan-vpc-project.id}"
-#   route_table_id = "${aws_route_table.rolan-rt.id}"
-#   cidr_block="10.0.11.0/24"
-#   user_data=templatefile("./scripts/app_user_data.sh", {mongodb_ip = module.db-tier.private_ip})
-#   ami_id = "ami-0cb88e06cf1447bd6"
-#   map_public_ip_on_launch = true
+module "application-tier" {
+  name="rolan-app"
+  source="./modules/application-tier" #looks for a main tf at that path
+  vpc_id="${aws_vpc.rolan-vpc-project.id}"
+  route_table_id = "${aws_route_table.rolan-rt.id}"
+  cidr_block="10.0.11.0/24"
+  user_data=templatefile("./scripts/app_user_data.sh", {mysql_ip = module.db-tier.private_ip})
+  ami_id = "${aws_ami.rolan-ami.id}"
+  map_public_ip_on_launch = true
 
-#   ingress = [{
-#     from_port       = 80
-#     to_port         = 80
-#     protocol        = "tcp"
-#     cidr_blocks = "0.0.0.0/0"
-#   }]
-# }
+  ingress = [{
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    cidr_blocks = "0.0.0.0/0"
+  }]
+}
