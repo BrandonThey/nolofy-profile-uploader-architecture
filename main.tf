@@ -31,6 +31,24 @@ resource "aws_route_table" "rolan-rt" {
  }
 }
 
+resource "aws_ebs_volume" "rolan-volume" {
+  availability_zone = "us-west-1"
+  size              = 8
+
+  tags = {
+    Name = "rolan-volume"
+  }
+}
+
+resource "aws_ebs_snapshot" "rolan_snap" {
+  volume_id = "${aws_ebs_volume.rolan-volume.id}"
+  description = "Snapshot for project-rolan"
+
+  tags = {
+    Name = "rolan_snap"
+  }
+}
+
 resource "aws_ami" "rolan-ami" {
   name                = "mysql-ami"
   virtualization_type = "hvm"
@@ -38,26 +56,9 @@ resource "aws_ami" "rolan-ami" {
 
   ebs_block_device {
     device_name = "/dev/sda1"
-    snapshot_id    = "snap-01f4170721db0d703"
+    snapshot_id    = "${aws_ebs_snapshot.rolan_snap.id}"
   }
 }
-
-# resource "aws_ebs_volume" "example" {
-#   availability_zone = "us-west-2a"
-#   size              = 40
-
-#   tags = {
-#     Name = "HelloWorld"
-#   }
-# }
-
-# resource "aws_ebs_snapshot" "example_snapshot" {
-#   volume_id = aws_ebs_volume.example.id
-
-#   tags = {
-#     Name = "HelloWorld_snap"
-#   }
-# }
 
 module "db-tier" {
   name="rolan-db"
