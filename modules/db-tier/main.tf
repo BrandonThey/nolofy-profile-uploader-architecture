@@ -15,7 +15,7 @@ resource "aws_route_table_association" "rolan-app-rta" {
 
 resource "aws_security_group" "group" {
   name = "${var.name}-sg"
-  description = "Allow access from MySQL only"
+  description = "Allow access to API and MySQL"
   vpc_id = "${var.vpc_id}"
 
   egress {
@@ -43,7 +43,7 @@ resource "aws_security_group_rule" "rule" {
 resource "aws_instance" "rolan-db" {
   ami                       = "${var.ami_id}"
   instance_type             = "t2.micro"
-   key_name                  = "rolanAWSKey2"
+  key_name                  = "rolanAWSKey2"
   user_data                 = "${var.user_data}"
   subnet_id                 = "${aws_subnet.rolan-db-subnet.id}"
   vpc_security_group_ids    = ["${aws_security_group.group.id}"]

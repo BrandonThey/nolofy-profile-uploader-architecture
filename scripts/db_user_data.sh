@@ -18,5 +18,7 @@ Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="userdata.txt"
 
 #!/bin/bash
+cd /home/ubuntu/app
+node index.js
 # sudo systemctl start mongod
 # --//--
