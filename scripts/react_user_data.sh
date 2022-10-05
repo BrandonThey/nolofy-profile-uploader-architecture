@@ -18,5 +18,5 @@ Content-Transfer-Encoding: 7bit
 Content-Disposition: attachment; filename="userdata.txt"
 
 #!/bin/bash
-sudo systemctl start mysql
-# --//--
+cd /home/ubuntu/nolog-profile-uploader-frontend/
+npm start

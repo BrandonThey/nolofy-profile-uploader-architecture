@@ -39,14 +39,14 @@ module "db-tier" {
   route_table_id = "${aws_vpc.rolan-vpc-project.main_route_table_id}"
   cidr_block="12.0.10.0/24"
   user_data=templatefile("./scripts/db_user_data.sh", {})
-  ami_id = "ami-0c22674a1666caa28" //use Jenkins packer ami
-  
+  ami_id = "ami-" //use Jenkins packer ami
+  map_public_ip_on_launch = true
 
   ingress = [{
     from_port       = 3024
     to_port         = 3024
     protocol        = "tcp"
-    cidr_blocks     = /*"0.0.0.0/0"*/ "${module.api-tier.subnet_cidr_block}"
+    cidr_blocks     = "${module.api-tier.subnet_cidr_block}"
   }]
 }
 
@@ -57,7 +57,25 @@ module "api-tier" {
   route_table_id = "${aws_route_table.rolan-rt.id}"
   cidr_block="12.0.11.0/24"
   user_data=templatefile("./scripts/api_user_data.sh", {mysql_ip = module.db-tier.private_ip})
-  ami_id = "ami-0091b294f8b94230a" //use Jenkins packer ami
+  ami_id = "ami-" //use Jenkins packer ami
+  map_public_ip_on_launch = true
+
+  ingress = [{
+    from_port       = 80
+    to_port         = 80
+    protocol        = "tcp"
+    cidr_blocks = "0.0.0.0/0"
+  }]
+}
+
+module "react-tier" {
+  name="rolan-react"
+  source="./modules/react-tier" #looks for a main tf at that path
+  vpc_id="${aws_vpc.rolan-vpc-project.id}"
+  route_table_id = "${aws_route_table.rolan-rt.id}"
+  cidr_block="12.0.12.0/24"
+  user_data=templatefile("./scripts/react_user_data.sh", {})
+  ami_id = "ami-" //use Jenkins packer ami
   map_public_ip_on_launch = true
 
   ingress = [{

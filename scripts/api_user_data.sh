@@ -19,8 +19,8 @@ Content-Disposition: attachment; filename="userdata.txt"
 
 #!/bin/bash
 echo export DB_PATH=${mysql_ip} >> /etc/profile
-cd /home/ubuntu/nolog-profile-uploader-frontend/
-npm start
+cd /home/ubuntu/app
+node index.js
 # sudo npm install -g pm2
 # pm2 start /home/ubuntu/app/index.js
 # --//--

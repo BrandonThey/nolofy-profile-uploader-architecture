@@ -1,21 +1,21 @@
-resource "aws_subnet" "rolan-db-subnet" {
+resource "aws_subnet" "rolan-react-subnet" {
   vpc_id = "${var.vpc_id}"
   cidr_block = "${var.cidr_block}"
   map_public_ip_on_launch = "${var.map_public_ip_on_launch}"
-
+  
   tags = {
     Name = "${var.name}-subnet"
   }
 }
 
-resource "aws_route_table_association" "rolan-api-rta" {
+resource "aws_route_table_association" "rolan-react-rta" {
   subnet_id      = "${aws_subnet.rolan-db-subnet.id}"
   route_table_id = "${var.route_table_id}"
 }
 
 resource "aws_security_group" "group" {
   name = "${var.name}-sg"
-  description = "Allow access to API and MySQL"
+  description = "Allow access to React"
   vpc_id = "${var.vpc_id}"
 
   egress {
@@ -45,7 +45,7 @@ resource "aws_instance" "rolan-db" {
   instance_type             = "t2.micro"
   key_name                  = "rolanAWSKey2"
   user_data                 = "${var.user_data}"
-  subnet_id                 = "${aws_subnet.rolan-db-subnet.id}"
+  subnet_id                 = "${aws_subnet.rolan-react-subnet.id}"
   vpc_security_group_ids    = ["${aws_security_group.group.id}"]
   tags = {
     Name = "${var.name}"
