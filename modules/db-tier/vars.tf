@@ -14,7 +14,6 @@ variable "name" {
   description = "name to be used for tagging instances"
 }
 
-
 variable "route_table_id" {
   description = "id of route table to associate with the subnet"
 }

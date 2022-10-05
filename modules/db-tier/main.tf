@@ -1,14 +1,13 @@
 resource "aws_subnet" "rolan-db-subnet" {
   vpc_id = "${var.vpc_id}"
   cidr_block = "${var.cidr_block}"
-  map_public_ip_on_launch = "${var.map_public_ip_on_launch}"
 
   tags = {
     Name = "${var.name}-subnet"
   }
 }
 
-resource "aws_route_table_association" "rolan-db-rta" {
+resource "aws_route_table_association" "rolan-api-rta" {
   subnet_id      = "${aws_subnet.rolan-db-subnet.id}"
   route_table_id = "${var.route_table_id}"
 }
