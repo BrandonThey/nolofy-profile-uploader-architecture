@@ -2,41 +2,41 @@ provider "aws" {
   region = "us-west-1"
 }
 
-resource "aws_vpc" "rolan-vpc-project" {
+resource "aws_vpc" "group2-vpc-project" {
   cidr_block = "12.0.0.0/16"
 
   tags = {
-    Name = "rolan-vpc-project"
+    Name = "group2-vpc-project"
   }
 }
 
-resource "aws_internet_gateway" "rolan-ig" {
-  vpc_id = "${aws_vpc.rolan-vpc-project.id}"
+resource "aws_internet_gateway" "group2-ig" {
+  vpc_id = "${aws_vpc.group2-vpc-project.id}"
   
   tags = {
-    Name = "rolan-ig"
+    Name = "group2-ig"
   }
 }
 
-resource "aws_route_table" "rolan-rt" {
-  vpc_id = "${aws_vpc.rolan-vpc-project.id}"
+resource "aws_route_table" "group2-rt" {
+  vpc_id = "${aws_vpc.group2-vpc-project.id}"
 
  route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = "${aws_internet_gateway.rolan-ig.id}"
+    gateway_id = "${aws_internet_gateway.group2-ig.id}"
  } 
 
  tags = {
-   Name = "rolan-rt"
+   Name = "group2-rt"
  }
 }
 
 
 module "db-tier" {
-  name="rolan-db"
+  name="group2-db"
   source="./modules/db-tier" #looks for a main tf at that path
-  vpc_id="${aws_vpc.rolan-vpc-project.id}"
-  route_table_id = "${aws_vpc.rolan-vpc-project.main_route_table_id}"
+  vpc_id="${aws_vpc.group2-vpc-project.id}"
+  route_table_id = "${aws_vpc.group2-vpc-project.main_route_table_id}"
   cidr_block="12.0.10.0/24"
   user_data=templatefile("./scripts/db_user_data.sh", {})
   ami_id = "ami-0387c46381ccab8c3" //use Jenkins packer ami
@@ -51,13 +51,13 @@ module "db-tier" {
 }
 
 module "api-tier" {
-  name="rolan-api"
+  name="group2-api"
   source="./modules/api-tier" #looks for a main tf at that path
-  vpc_id="${aws_vpc.rolan-vpc-project.id}"
-  route_table_id = "${aws_route_table.rolan-rt.id}"
+  vpc_id="${aws_vpc.group2-vpc-project.id}"
+  route_table_id = "${aws_route_table.group2-rt.id}"
   cidr_block="12.0.11.0/24"
   user_data=templatefile("./scripts/api_user_data.sh", {mysql_ip = module.db-tier.private_ip})
-  ami_id = "ami-075f72be3b4896e7f" //use Jenkins packer ami
+  ami_id = "ami-0afe98a0b5ace8648" //use Jenkins packer ami
   map_public_ip_on_launch = true
 
   ingress = [{
@@ -69,13 +69,13 @@ module "api-tier" {
 }
 
 module "react-tier" {
-  name="rolan-react"
+  name="group2-react"
   source="./modules/react-tier" #looks for a main tf at that path
-  vpc_id="${aws_vpc.rolan-vpc-project.id}"
-  route_table_id = "${aws_route_table.rolan-rt.id}"
+  vpc_id="${aws_vpc.group2-vpc-project.id}"
+  route_table_id = "${aws_route_table.group2-rt.id}"
   cidr_block="12.0.12.0/24"
   user_data=templatefile("./scripts/react_user_data.sh", {})
-  ami_id = "ami-05b8af94e5b5ee3cb" //use Jenkins packer ami
+  ami_id = "ami-00ad689602f14e2da" //use Jenkins packer ami
   map_public_ip_on_launch = true
 
   ingress = [{

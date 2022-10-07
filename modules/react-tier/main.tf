@@ -1,4 +1,4 @@
-resource "aws_subnet" "rolan-react-subnet" {
+resource "aws_subnet" "group2-react-subnet" {
   vpc_id = "${var.vpc_id}"
   cidr_block = "${var.cidr_block}"
   map_public_ip_on_launch = "${var.map_public_ip_on_launch}"
@@ -8,8 +8,8 @@ resource "aws_subnet" "rolan-react-subnet" {
   }
 }
 
-resource "aws_route_table_association" "rolan-react-rta" {
-  subnet_id      = "${aws_subnet.rolan-react-subnet.id}"
+resource "aws_route_table_association" "group2-react-rta" {
+  subnet_id      = "${aws_subnet.group2-react-subnet.id}"
   route_table_id = "${var.route_table_id}"
 }
 
@@ -40,12 +40,12 @@ resource "aws_security_group_rule" "rule" {
   security_group_id = "${aws_security_group.group.id}"
 }
 
-resource "aws_instance" "rolan-react" {
+resource "aws_instance" "group2-react" {
   ami                       = "${var.ami_id}"
   instance_type             = "t2.micro"
   key_name                  = "rolanAWSKey2"
   user_data                 = "${var.user_data}"
-  subnet_id                 = "${aws_subnet.rolan-react-subnet.id}"
+  subnet_id                 = "${aws_subnet.group2-react-subnet.id}"
   vpc_security_group_ids    = ["${aws_security_group.group.id}"]
   tags = {
     Name = "${var.name}"
