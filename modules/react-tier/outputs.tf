@@ -3,5 +3,5 @@ output "subnet_cidr_block" {
 }
 
 output "private_ip" {
-  value = "${aws_instance.rolan-app.private_ip}"
+  value = "${aws_instance.rolan-react.private_ip}"
 }

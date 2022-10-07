@@ -9,7 +9,7 @@ resource "aws_subnet" "rolan-react-subnet" {
 }
 
 resource "aws_route_table_association" "rolan-react-rta" {
-  subnet_id      = "${aws_subnet.rolan-db-subnet.id}"
+  subnet_id      = "${aws_subnet.rolan-react-subnet.id}"
   route_table_id = "${var.route_table_id}"
 }
 
@@ -40,7 +40,7 @@ resource "aws_security_group_rule" "rule" {
   security_group_id = "${aws_security_group.group.id}"
 }
 
-resource "aws_instance" "rolan-db" {
+resource "aws_instance" "rolan-react" {
   ami                       = "${var.ami_id}"
   instance_type             = "t2.micro"
   key_name                  = "rolanAWSKey2"
